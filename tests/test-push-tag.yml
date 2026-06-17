@@ -1,0 +1,52 @@
+name: Test push tag slug
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          short-length: "7"
+      - name: Assert GITHUB_REF_SLUG is set
+        run: |
+          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+      - name: Assert GITHUB_REF_SLUG_URL is set
+        run: |
+          echo "GITHUB_REF_SLUG_URL: $GITHUB_REF_SLUG_URL"
+          if [ -z "$GITHUB_REF_SLUG_URL" ]; then
+            echo "FAIL: GITHUB_REF_SLUG_URL is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+      - name: Assert GITHUB_SHA_SHORT is set
+        run: |
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT"
+      - name: Assert GITHUB_REF_SLUG_URL does not contain dots
+        run: |
+          echo "GITHUB_REF_SLUG_URL: $GITHUB_REF_SLUG_URL"
+          if echo "$GITHUB_REF_SLUG_URL" | grep -q '\.'; then
+            echo "FAIL: GITHUB_REF_SLUG_URL contains dots: $GITHUB_REF_SLUG_URL"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG_URL has no dots"
+      - name: Assert GITHUB_REPOSITORY_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG: $GITHUB_REPOSITORY_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG"
