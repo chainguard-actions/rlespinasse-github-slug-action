@@ -8,6 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
+| v5.2.0 | [`v5.2.0`](https://github.com/chainguard-actions/rlespinasse-github-slug-action/tree/v5.2.0) | [`c33ff65`](https://github.com/rlespinasse/github-slug-action/commit/c33ff65466c58d57e4d796f88bb1ae0ff26ee453) |
 | v5.4.0 | [`v5.4.0`](https://github.com/chainguard-actions/rlespinasse-github-slug-action/tree/v5.4.0) | [`6f7a8d2`](https://github.com/rlespinasse/github-slug-action/commit/6f7a8d2348e2a4aa5defafcdaafe5aef3f83bd4b) |
 
 ## Privacy
