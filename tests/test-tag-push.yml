@@ -1,0 +1,67 @@
+name: Test tag push slug
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: slug
+        uses: .
+        with:
+          slug-maxlength: "63"
+
+      - name: Assert GITHUB_REF_SLUG is set
+        run: |
+          echo "GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+
+      - name: Assert GITHUB_REF_NAME_SLUG is set
+        run: |
+          echo "GITHUB_REF_NAME_SLUG=$GITHUB_REF_NAME_SLUG"
+          if [ -z "$GITHUB_REF_NAME_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_NAME_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_NAME_SLUG=$GITHUB_REF_NAME_SLUG"
+
+      - name: Assert GITHUB_REPOSITORY_OWNER_PART_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_OWNER_PART_SLUG=$GITHUB_REPOSITORY_OWNER_PART_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_OWNER_PART_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_OWNER_PART_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS"
+
+      - name: Assert GITHUB_REPOSITORY_NAME_PART_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_NAME_PART_SLUG=$GITHUB_REPOSITORY_NAME_PART_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_NAME_PART_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_NAME_PART_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS"
+
+      - name: Assert GITHUB_REF_SLUG_URL is set
+        run: |
+          echo "GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+          if [ -z "$GITHUB_REF_SLUG_URL" ]; then
+            echo "FAIL: GITHUB_REF_SLUG_URL is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+
+      - name: Assert GITHUB_REF_SLUG_URL has no dots or underscores (URL-safe)
+        run: |
+          echo "GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+          if echo "$GITHUB_REF_SLUG_URL" | grep -qP '[._]'; then
+            echo "FAIL: GITHUB_REF_SLUG_URL contains dots or underscores, not URL-safe"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG_URL is URL-safe"

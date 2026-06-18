@@ -1,0 +1,38 @@
+name: Test short-length input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+      GITHUB_REPOSITORY: test-owner/test-repo
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          short-length: "7"
+      - name: Assert GITHUB_SHA_SHORT is set and has correct length
+        run: |
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is not set"
+            exit 1
+          fi
+          len=${#GITHUB_SHA_SHORT}
+          echo "Length of GITHUB_SHA_SHORT: $len"
+          if [ "$len" -ne 7 ]; then
+            echo "FAIL: expected GITHUB_SHA_SHORT length 7, got $len"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert GITHUB_REF_SLUG is set
+        run: |
+          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is not set"
+            exit 1
+          fi
+          echo "PASS"

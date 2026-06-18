@@ -1,0 +1,85 @@
+name: Test push branch slug
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: slug
+        uses: .
+        with:
+          slug-maxlength: "63"
+
+      - name: Assert GITHUB_REF_SLUG is set
+        run: |
+          echo "GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+
+      - name: Assert GITHUB_REF_SLUG_URL is set
+        run: |
+          echo "GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+          if [ -z "$GITHUB_REF_SLUG_URL" ]; then
+            echo "FAIL: GITHUB_REF_SLUG_URL is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+
+      - name: Assert GITHUB_REF_NAME_SLUG is set
+        run: |
+          echo "GITHUB_REF_NAME_SLUG=$GITHUB_REF_NAME_SLUG"
+          if [ -z "$GITHUB_REF_NAME_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_NAME_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_NAME_SLUG=$GITHUB_REF_NAME_SLUG"
+
+      - name: Assert GITHUB_REPOSITORY_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG"
+
+      - name: Assert GITHUB_SHA_SHORT is set
+        run: |
+          echo "GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT"
+
+      - name: Assert GITHUB_REF_SLUG contains only valid slug characters
+        run: |
+          echo "GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+          if echo "$GITHUB_REF_SLUG" | grep -qP '[^a-z0-9._-]'; then
+            echo "FAIL: GITHUB_REF_SLUG contains invalid characters"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG has valid slug characters"
+
+      - name: Assert GITHUB_REPOSITORY_OWNER_PART_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_OWNER_PART_SLUG=$GITHUB_REPOSITORY_OWNER_PART_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_OWNER_PART_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_OWNER_PART_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS"
+
+      - name: Assert GITHUB_REPOSITORY_NAME_PART_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_NAME_PART_SLUG=$GITHUB_REPOSITORY_NAME_PART_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_NAME_PART_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_NAME_PART_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS"

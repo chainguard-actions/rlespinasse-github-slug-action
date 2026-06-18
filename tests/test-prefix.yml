@@ -1,0 +1,68 @@
+name: Test prefix input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: slug
+        uses: .
+        with:
+          prefix: "MY_"
+          slug-maxlength: "63"
+
+      - name: Assert prefixed MY_GITHUB_REF_SLUG is set
+        run: |
+          echo "MY_GITHUB_REF_SLUG=$MY_GITHUB_REF_SLUG"
+          if [ -z "$MY_GITHUB_REF_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_REF_SLUG=$MY_GITHUB_REF_SLUG"
+
+      - name: Assert prefixed MY_GITHUB_REPOSITORY_SLUG is set
+        run: |
+          echo "MY_GITHUB_REPOSITORY_SLUG=$MY_GITHUB_REPOSITORY_SLUG"
+          if [ -z "$MY_GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_REPOSITORY_SLUG=$MY_GITHUB_REPOSITORY_SLUG"
+
+      - name: Assert prefixed MY_GITHUB_REF_SLUG_URL is set
+        run: |
+          echo "MY_GITHUB_REF_SLUG_URL=$MY_GITHUB_REF_SLUG_URL"
+          if [ -z "$MY_GITHUB_REF_SLUG_URL" ]; then
+            echo "FAIL: MY_GITHUB_REF_SLUG_URL is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_REF_SLUG_URL=$MY_GITHUB_REF_SLUG_URL"
+
+      - name: Assert prefixed MY_GITHUB_REF_NAME_SLUG is set
+        run: |
+          echo "MY_GITHUB_REF_NAME_SLUG=$MY_GITHUB_REF_NAME_SLUG"
+          if [ -z "$MY_GITHUB_REF_NAME_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REF_NAME_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_REF_NAME_SLUG=$MY_GITHUB_REF_NAME_SLUG"
+
+      - name: Assert prefixed MY_GITHUB_SHA_SHORT is set
+        run: |
+          echo "MY_GITHUB_SHA_SHORT=$MY_GITHUB_SHA_SHORT"
+          if [ -z "$MY_GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: MY_GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_SHA_SHORT=$MY_GITHUB_SHA_SHORT"
+
+      - name: Assert MY_GITHUB_REF_SLUG contains only valid slug characters
+        run: |
+          echo "MY_GITHUB_REF_SLUG=$MY_GITHUB_REF_SLUG"
+          if echo "$MY_GITHUB_REF_SLUG" | grep -qP '[^a-z0-9._-]'; then
+            echo "FAIL: MY_GITHUB_REF_SLUG contains invalid characters"
+            exit 1
+          fi
+          echo "PASS"
