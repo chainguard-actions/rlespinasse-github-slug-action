@@ -1,0 +1,45 @@
+name: Test custom slug-maxlength
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          slug-maxlength: "10"
+        env:
+          GITHUB_REF: refs/heads/this-is-a-very-long-branch-name-that-exceeds-ten-chars
+
+      - name: Assert GITHUB_REF_SLUG is truncated to max 10 chars
+        run: |
+          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
+          LEN=${#GITHUB_REF_SLUG}
+          echo "Length: $LEN"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          if [ "$LEN" -gt 10 ]; then
+            echo "FAIL: GITHUB_REF_SLUG length $LEN exceeds max 10"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG (length=$LEN)"
+
+      - name: Assert GITHUB_REPOSITORY_SLUG is truncated to max 10 chars
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG: $GITHUB_REPOSITORY_SLUG"
+          LEN=${#GITHUB_REPOSITORY_SLUG}
+          echo "Length: $LEN"
+          if [ -z "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          if [ "$LEN" -gt 10 ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG length $LEN exceeds max 10"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG (length=$LEN)"

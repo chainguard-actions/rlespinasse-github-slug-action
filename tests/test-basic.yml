@@ -1,0 +1,67 @@
+name: Test basic usage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        env:
+          GITHUB_REF: refs/heads/main
+
+      - name: Assert GITHUB_REF_SLUG is set
+        run: |
+          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+
+      - name: Assert GITHUB_REF_SLUG_URL is set
+        run: |
+          echo "GITHUB_REF_SLUG_URL: $GITHUB_REF_SLUG_URL"
+          if [ -z "$GITHUB_REF_SLUG_URL" ]; then
+            echo "FAIL: GITHUB_REF_SLUG_URL is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+
+      - name: Assert GITHUB_REPOSITORY_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG: $GITHUB_REPOSITORY_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG"
+
+      - name: Assert GITHUB_SHA_SHORT is set
+        run: |
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT"
+
+      - name: Assert GITHUB_REPOSITORY_OWNER_PART_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_OWNER_PART_SLUG: $GITHUB_REPOSITORY_OWNER_PART_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_OWNER_PART_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_OWNER_PART_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_OWNER_PART_SLUG=$GITHUB_REPOSITORY_OWNER_PART_SLUG"
+
+      - name: Assert GITHUB_REPOSITORY_NAME_PART_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_NAME_PART_SLUG: $GITHUB_REPOSITORY_NAME_PART_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_NAME_PART_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_NAME_PART_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_NAME_PART_SLUG=$GITHUB_REPOSITORY_NAME_PART_SLUG"

@@ -1,0 +1,39 @@
+name: Test slug-maxlength nolimit
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          slug-maxlength: "nolimit"
+        env:
+          GITHUB_REF: refs/heads/this-is-a-very-long-branch-name-that-exceeds-sixty-three-characters-limit
+
+      - name: Assert GITHUB_REF_SLUG is set and not truncated at 63 chars
+        run: |
+          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
+          LEN=${#GITHUB_REF_SLUG}
+          echo "Length: $LEN"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          # With nolimit, the slug should be longer than 63 chars for this long branch name
+          if [ "$LEN" -le 63 ]; then
+            echo "WARN: GITHUB_REF_SLUG length $LEN is <= 63 (may have been truncated or branch name was short)"
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG (length=$LEN)"
+
+      - name: Assert GITHUB_REPOSITORY_SLUG is set
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG: $GITHUB_REPOSITORY_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG"

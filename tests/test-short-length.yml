@@ -1,0 +1,37 @@
+name: Test custom short-length
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          short-length: "4"
+
+      - name: Assert GITHUB_SHA_SHORT is set and has length 4
+        run: |
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          LEN=${#GITHUB_SHA_SHORT}
+          echo "Length: $LEN"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          if [ "$LEN" -ne 4 ]; then
+            echo "FAIL: GITHUB_SHA_SHORT length $LEN is not 4"
+            exit 1
+          fi
+          echo "PASS: GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT (length=$LEN)"
+
+      - name: Assert GITHUB_REF_SLUG is set
+        run: |
+          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
