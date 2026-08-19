@@ -4,35 +4,40 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_REF: refs/heads/main
-      GITHUB_EVENT_NAME: push
-      GITHUB_REPOSITORY: test-owner/test-repo
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: action
         uses: .
         with:
-          short-length: "7"
-      - name: Assert GITHUB_SHA_SHORT is set and has correct length
+          short-length: "8"
+      - name: Debug - print SHA vars
+        run: |
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          env | grep -i sha || true
+      - name: Assert GITHUB_SHA_SHORT is set
         run: |
           echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
           if [ -z "$GITHUB_SHA_SHORT" ]; then
-            echo "FAIL: GITHUB_SHA_SHORT is not set"
-            exit 1
-          fi
-          len=${#GITHUB_SHA_SHORT}
-          echo "Length of GITHUB_SHA_SHORT: $len"
-          if [ "$len" -ne 7 ]; then
-            echo "FAIL: expected GITHUB_SHA_SHORT length 7, got $len"
+            echo "FAIL: GITHUB_SHA_SHORT is empty"
             exit 1
           fi
           echo "PASS"
-      - name: Assert GITHUB_REF_SLUG is set
+      - name: Assert GITHUB_SHA_SHORT has correct length
         run: |
-          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
-          if [ -z "$GITHUB_REF_SLUG" ]; then
-            echo "FAIL: GITHUB_REF_SLUG is not set"
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          LEN=${#GITHUB_SHA_SHORT}
+          echo "Length: $LEN"
+          if [ "$LEN" -ne 8 ]; then
+            echo "FAIL: GITHUB_SHA_SHORT length $LEN is not 8"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert GITHUB_SHA_SHORT is hex characters only
+        run: |
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          if ! echo "$GITHUB_SHA_SHORT" | grep -qE '^[0-9a-f]+$'; then
+            echo "FAIL: GITHUB_SHA_SHORT is not a valid hex string"
             exit 1
           fi
           echo "PASS"

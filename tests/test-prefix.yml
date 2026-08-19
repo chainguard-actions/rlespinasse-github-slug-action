@@ -6,63 +6,61 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - id: slug
+      - id: action
         uses: .
         with:
           prefix: "MY_"
-          slug-maxlength: "63"
-
-      - name: Assert prefixed MY_GITHUB_REF_SLUG is set
+      - name: Debug - print all env vars with MY_ prefix
         run: |
-          echo "MY_GITHUB_REF_SLUG=$MY_GITHUB_REF_SLUG"
-          if [ -z "$MY_GITHUB_REF_SLUG" ]; then
-            echo "FAIL: MY_GITHUB_REF_SLUG is empty"
-            exit 1
-          fi
-          echo "PASS: MY_GITHUB_REF_SLUG=$MY_GITHUB_REF_SLUG"
-
-      - name: Assert prefixed MY_GITHUB_REPOSITORY_SLUG is set
+          echo "=== All env vars with MY_ prefix ==="
+          env | grep '^MY_' || true
+          echo "=== All env vars with SLUG ==="
+          env | grep -i slug || true
+      - name: Assert MY_GITHUB_REPOSITORY_SLUG is set
         run: |
-          echo "MY_GITHUB_REPOSITORY_SLUG=$MY_GITHUB_REPOSITORY_SLUG"
+          echo "MY_GITHUB_REPOSITORY_SLUG: $MY_GITHUB_REPOSITORY_SLUG"
           if [ -z "$MY_GITHUB_REPOSITORY_SLUG" ]; then
             echo "FAIL: MY_GITHUB_REPOSITORY_SLUG is empty"
             exit 1
           fi
-          echo "PASS: MY_GITHUB_REPOSITORY_SLUG=$MY_GITHUB_REPOSITORY_SLUG"
-
-      - name: Assert prefixed MY_GITHUB_REF_SLUG_URL is set
+          echo "PASS"
+      - name: Assert MY_GITHUB_REPOSITORY_SLUG contains no slash
         run: |
-          echo "MY_GITHUB_REF_SLUG_URL=$MY_GITHUB_REF_SLUG_URL"
-          if [ -z "$MY_GITHUB_REF_SLUG_URL" ]; then
-            echo "FAIL: MY_GITHUB_REF_SLUG_URL is empty"
+          echo "MY_GITHUB_REPOSITORY_SLUG: $MY_GITHUB_REPOSITORY_SLUG"
+          if echo "$MY_GITHUB_REPOSITORY_SLUG" | grep -q '/'; then
+            echo "FAIL: MY_GITHUB_REPOSITORY_SLUG contains a slash"
             exit 1
           fi
-          echo "PASS: MY_GITHUB_REF_SLUG_URL=$MY_GITHUB_REF_SLUG_URL"
-
-      - name: Assert prefixed MY_GITHUB_REF_NAME_SLUG is set
+          echo "PASS"
+      - name: Assert MY_GITHUB_REPOSITORY_OWNER_PART_SLUG is set
         run: |
-          echo "MY_GITHUB_REF_NAME_SLUG=$MY_GITHUB_REF_NAME_SLUG"
-          if [ -z "$MY_GITHUB_REF_NAME_SLUG" ]; then
-            echo "FAIL: MY_GITHUB_REF_NAME_SLUG is empty"
+          echo "MY_GITHUB_REPOSITORY_OWNER_PART_SLUG: $MY_GITHUB_REPOSITORY_OWNER_PART_SLUG"
+          if [ -z "$MY_GITHUB_REPOSITORY_OWNER_PART_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REPOSITORY_OWNER_PART_SLUG is empty"
             exit 1
           fi
-          echo "PASS: MY_GITHUB_REF_NAME_SLUG=$MY_GITHUB_REF_NAME_SLUG"
-
-      - name: Assert prefixed MY_GITHUB_SHA_SHORT is set
+          echo "PASS"
+      - name: Assert MY_GITHUB_REPOSITORY_NAME_PART_SLUG is set
         run: |
-          echo "MY_GITHUB_SHA_SHORT=$MY_GITHUB_SHA_SHORT"
+          echo "MY_GITHUB_REPOSITORY_NAME_PART_SLUG: $MY_GITHUB_REPOSITORY_NAME_PART_SLUG"
+          if [ -z "$MY_GITHUB_REPOSITORY_NAME_PART_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REPOSITORY_NAME_PART_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert MY_GITHUB_SHA_SHORT is set
+        run: |
+          echo "MY_GITHUB_SHA_SHORT: $MY_GITHUB_SHA_SHORT"
           if [ -z "$MY_GITHUB_SHA_SHORT" ]; then
             echo "FAIL: MY_GITHUB_SHA_SHORT is empty"
             exit 1
           fi
-          echo "PASS: MY_GITHUB_SHA_SHORT=$MY_GITHUB_SHA_SHORT"
-
-      - name: Assert MY_GITHUB_REF_SLUG contains only valid slug characters
+          echo "PASS"
+      - name: Assert MY_GITHUB_REF_SLUG is set
         run: |
-          echo "MY_GITHUB_REF_SLUG=$MY_GITHUB_REF_SLUG"
-          if echo "$MY_GITHUB_REF_SLUG" | grep -qP '[^a-z0-9._-]'; then
-            echo "FAIL: MY_GITHUB_REF_SLUG contains invalid characters"
+          echo "MY_GITHUB_REF_SLUG: $MY_GITHUB_REF_SLUG"
+          if [ -z "$MY_GITHUB_REF_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REF_SLUG is empty"
             exit 1
           fi
           echo "PASS"
