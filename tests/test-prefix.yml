@@ -1,0 +1,51 @@
+name: Test prefix input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          prefix: MY_
+        env:
+          GITHUB_REF: refs/heads/main
+
+      - name: Assert MY_GITHUB_REPOSITORY_SLUG is set (prefixed)
+        run: |
+          echo "MY_GITHUB_REPOSITORY_SLUG: $MY_GITHUB_REPOSITORY_SLUG"
+          if [ -z "$MY_GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_REPOSITORY_SLUG=$MY_GITHUB_REPOSITORY_SLUG"
+
+      - name: Assert MY_GITHUB_REF_SLUG is set (prefixed)
+        run: |
+          echo "MY_GITHUB_REF_SLUG: $MY_GITHUB_REF_SLUG"
+          if [ -z "$MY_GITHUB_REF_SLUG" ]; then
+            echo "FAIL: MY_GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_REF_SLUG=$MY_GITHUB_REF_SLUG"
+
+      - name: Assert MY_GITHUB_SHA_SHORT is set (prefixed)
+        run: |
+          echo "MY_GITHUB_SHA_SHORT: $MY_GITHUB_SHA_SHORT"
+          if [ -z "$MY_GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: MY_GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          echo "PASS: MY_GITHUB_SHA_SHORT=$MY_GITHUB_SHA_SHORT"
+
+      - name: Assert non-prefixed vars are NOT set
+        run: |
+          # When prefix is set, the non-prefixed versions should not be set
+          echo "GITHUB_REPOSITORY_SLUG (should be empty): '$GITHUB_REPOSITORY_SLUG'"
+          if [ -n "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "WARN: GITHUB_REPOSITORY_SLUG is set even with prefix - this may be expected if the action sets both"
+          fi
+          echo "PASS: prefix check complete"

@@ -1,0 +1,77 @@
+name: Test slug value correctness
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        env:
+          GITHUB_REF: refs/heads/feature/My-Feature_Branch
+
+      - name: Assert GITHUB_REF_SLUG is lowercase and slug-safe
+        run: |
+          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
+          if [ -z "$GITHUB_REF_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          # Slug should be lowercase
+          LOWER=$(echo "$GITHUB_REF_SLUG" | tr '[:upper:]' '[:lower:]')
+          if [ "$GITHUB_REF_SLUG" != "$LOWER" ]; then
+            echo "FAIL: GITHUB_REF_SLUG is not lowercase: $GITHUB_REF_SLUG"
+            exit 1
+          fi
+          # Slug should not contain slashes
+          if echo "$GITHUB_REF_SLUG" | grep -q '/'; then
+            echo "FAIL: GITHUB_REF_SLUG contains slashes: $GITHUB_REF_SLUG"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
+
+      - name: Assert GITHUB_REF_SLUG_URL is lowercase and URL-safe
+        run: |
+          echo "GITHUB_REF_SLUG_URL: $GITHUB_REF_SLUG_URL"
+          if [ -z "$GITHUB_REF_SLUG_URL" ]; then
+            echo "FAIL: GITHUB_REF_SLUG_URL is empty"
+            exit 1
+          fi
+          # URL slug should be lowercase
+          LOWER=$(echo "$GITHUB_REF_SLUG_URL" | tr '[:upper:]' '[:lower:]')
+          if [ "$GITHUB_REF_SLUG_URL" != "$LOWER" ]; then
+            echo "FAIL: GITHUB_REF_SLUG_URL is not lowercase: $GITHUB_REF_SLUG_URL"
+            exit 1
+          fi
+          # URL slug should not contain slashes or underscores
+          if echo "$GITHUB_REF_SLUG_URL" | grep -qE '[/_]'; then
+            echo "FAIL: GITHUB_REF_SLUG_URL contains slashes or underscores: $GITHUB_REF_SLUG_URL"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_SLUG_URL=$GITHUB_REF_SLUG_URL"
+
+      - name: Assert GITHUB_REPOSITORY_SLUG is set and slug-safe
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG: $GITHUB_REPOSITORY_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          # Slug should be lowercase
+          LOWER=$(echo "$GITHUB_REPOSITORY_SLUG" | tr '[:upper:]' '[:lower:]')
+          if [ "$GITHUB_REPOSITORY_SLUG" != "$LOWER" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is not lowercase: $GITHUB_REPOSITORY_SLUG"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG"
+
+      - name: Assert GITHUB_REF_NAME_SLUG is set
+        run: |
+          echo "GITHUB_REF_NAME_SLUG: $GITHUB_REF_NAME_SLUG"
+          if [ -z "$GITHUB_REF_NAME_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_NAME_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REF_NAME_SLUG=$GITHUB_REF_NAME_SLUG"

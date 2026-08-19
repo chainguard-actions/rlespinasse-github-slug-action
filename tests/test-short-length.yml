@@ -1,0 +1,39 @@
+name: Test short-length input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          short-length: "8"
+        env:
+          GITHUB_REF: refs/heads/main
+
+      - name: Assert GITHUB_SHA_SHORT is set and has correct length
+        run: |
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          LEN=${#GITHUB_SHA_SHORT}
+          echo "Length: $LEN"
+          if [ "$LEN" -ne 8 ]; then
+            echo "FAIL: GITHUB_SHA_SHORT length $LEN does not equal 8"
+            exit 1
+          fi
+          echo "PASS: GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT (length=$LEN)"
+
+      - name: Assert GITHUB_SHA_SHORT contains only hex characters
+        run: |
+          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
+          if ! echo "$GITHUB_SHA_SHORT" | grep -qE '^[0-9a-f]+$'; then
+            echo "FAIL: GITHUB_SHA_SHORT contains non-hex characters"
+            exit 1
+          fi
+          echo "PASS: GITHUB_SHA_SHORT is valid hex"

@@ -1,0 +1,135 @@
+name: "GitHub Slug Action"
+description: "GitHub Action to expose slug value of environment variables inside your GitHub workflow"
+author: "Romain Lespinasse"
+branding:
+  icon: "minimize"
+  color: "blue"
+inputs:
+  prefix:
+    description: "Value to prepend to each generated variable"
+    default: ""
+    required: false
+  slug-maxlength:
+    description: "Max length of the slugified values"
+    default: "63"
+    required: true
+  short-length:
+    description: "Length of the shortify values (git default if empty)"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Chainguard usage telemetry
+      shell: bash
+      run: |
+        # Best-effort, fails open. Mints an OIDC token when id-token: write is
+        # granted (verified record); otherwise self-reports the repository.
+        tok=""
+        if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
+          tok=$(curl -sf --max-time 2 \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=actions.chainguard.dev" \
+            | sed -n 's/.*"value":"\([^"]*\)".*/\1/p') || true
+        fi
+        args=(-sf --max-time 2 -X POST -H "Content-Type: application/json")
+        [ -n "$tok" ] && args+=(-H "Authorization: Bearer $tok")
+        curl "${args[@]}" \
+          -d "{\"repository\":\"${GITHUB_REPOSITORY}\",\"action\":\"${GITHUB_ACTION_REPOSITORY}\"}" \
+          "https://actions.enforce.dev/actions/v1/record" >/dev/null 2>&1 || true
+    - run: $GITHUB_ACTION_PATH/preflight.sh
+      id: prefligth
+      shell: bash
+      env:
+        INPUT_SLUG_MAXLENGTH: ${{ inputs.slug-maxlength }}
+        INPUT_SHORT_LENGTH: ${{ inputs.short-length }}
+    # From Environment Variables
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_REPOSITORY
+        value: ${{ github.repository }}
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_REF
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_HEAD_REF
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_BASE_REF
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    # From Specific values
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_EVENT_REF
+        value: ${{ github.event.ref }}
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_REF_NAME
+        value: ${{ github.ref_name }}
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_REF_POINT
+        value: ${{ env.GITHUB_HEAD_REF_RAW || env.GITHUB_REF_NAME_RAW }}
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+      env:
+        GITHUB_HEAD_REF_RAW: ${{ github.head_ref }}
+        GITHUB_REF_NAME_RAW: ${{ github.ref_name }}
+    # From Calculated values
+    - id: get-github-repository-owner-part
+      run: |
+        ownerpart=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f1)
+        safe_ownerpart=$(printf '%s' "$ownerpart" | tr -d '\n\r')
+        if [ -f "$GITHUB_OUTPUT" ]; then
+          echo "github-repository-owner-part=${safe_ownerpart}" >> "$GITHUB_OUTPUT"
+        else
+          echo "::set-output name=github-repository-owner-part::${safe_ownerpart}"
+        fi
+      shell: bash
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_REPOSITORY_OWNER_PART
+        value: ${{ steps.get-github-repository-owner-part.outputs.github-repository-owner-part }}
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    - id: get-github-repository-name-part
+      run: |
+        namepart=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)
+        safe_namepart=$(printf '%s' "$namepart" | tr -d '\n\r')
+        if [ -f "$GITHUB_OUTPUT" ]; then
+          echo "github-repository-name-part=${safe_namepart}" >> "$GITHUB_OUTPUT"
+        else
+          echo "::set-output name=github-repository-name-part::${safe_namepart}"
+        fi
+      shell: bash
+    - uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
+      with:
+        key: GITHUB_REPOSITORY_NAME_PART
+        value: ${{ steps.get-github-repository-name-part.outputs.github-repository-name-part }}
+        prefix: ${{ inputs.prefix }}
+        slug-maxlength: ${{ inputs.slug-maxlength }}
+    # From sha
+    - uses: rlespinasse/shortify-git-revision@c90ba7007ef6c152254d10b9f1a327966ab13077 # v1.6.0
+      with:
+        name: GITHUB_SHA
+        short-on-error: true
+        length: ${{ steps.prefligth.outputs.PREFLIGHT_SHORT_LENGTH }}
+        prefix: ${{ inputs.prefix }}
+    - uses: rlespinasse/shortify-git-revision@c90ba7007ef6c152254d10b9f1a327966ab13077 # v1.6.0
+      with:
+        name: GITHUB_EVENT_PULL_REQUEST_HEAD_SHA
+        revision: ${{ github.event.pull_request.head.sha }}
+        short-on-error: true
+        length: ${{ steps.prefligth.outputs.PREFLIGHT_SHORT_LENGTH }}
+        prefix: ${{ inputs.prefix }}
