@@ -1,0 +1,40 @@
+name: Test short-length for SHA shortening
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action-default
+        uses: .
+
+      - name: Capture default SHA short
+        run: |
+          echo "GITHUB_SHA_SHORT (default): $GITHUB_SHA_SHORT"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is empty with default short-length"
+            exit 1
+          fi
+          echo "PASS: default GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT"
+
+      - id: action-short4
+        uses: .
+        with:
+          short-length: "4"
+
+      - name: Assert GITHUB_SHA_SHORT is exactly 4 characters with short-length=4
+        run: |
+          echo "GITHUB_SHA_SHORT (short-length=4): $GITHUB_SHA_SHORT"
+          if [ -z "$GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          LEN=${#GITHUB_SHA_SHORT}
+          echo "Length: $LEN"
+          if [ "$LEN" -ne 4 ]; then
+            echo "FAIL: expected GITHUB_SHA_SHORT length 4, got $LEN"
+            exit 1
+          fi
+          echo "PASS: GITHUB_SHA_SHORT='$GITHUB_SHA_SHORT' (length=$LEN)"

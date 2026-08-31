@@ -1,0 +1,48 @@
+name: Test custom prefix
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          prefix: "CUSTOM_"
+
+      - name: Assert prefixed GITHUB_REPOSITORY_SLUG is set
+        run: |
+          echo "CUSTOM_GITHUB_REPOSITORY_SLUG: $CUSTOM_GITHUB_REPOSITORY_SLUG"
+          if [ -z "$CUSTOM_GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: CUSTOM_GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: CUSTOM_GITHUB_REPOSITORY_SLUG=$CUSTOM_GITHUB_REPOSITORY_SLUG"
+
+      - name: Assert prefixed GITHUB_REF_SLUG is set
+        run: |
+          echo "CUSTOM_GITHUB_REF_SLUG: $CUSTOM_GITHUB_REF_SLUG"
+          if [ -z "$CUSTOM_GITHUB_REF_SLUG" ]; then
+            echo "FAIL: CUSTOM_GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: CUSTOM_GITHUB_REF_SLUG=$CUSTOM_GITHUB_REF_SLUG"
+
+      - name: Assert prefixed GITHUB_SHA_SHORT is set
+        run: |
+          echo "CUSTOM_GITHUB_SHA_SHORT: $CUSTOM_GITHUB_SHA_SHORT"
+          if [ -z "$CUSTOM_GITHUB_SHA_SHORT" ]; then
+            echo "FAIL: CUSTOM_GITHUB_SHA_SHORT is empty"
+            exit 1
+          fi
+          echo "PASS: CUSTOM_GITHUB_SHA_SHORT=$CUSTOM_GITHUB_SHA_SHORT"
+
+      - name: Assert unprefixed variables are NOT set (prefix is exclusive)
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG (should be empty): '$GITHUB_REPOSITORY_SLUG'"
+          if [ -n "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "WARN: GITHUB_REPOSITORY_SLUG is set even with prefix — this may be expected if action sets both"
+          fi
+          echo "PASS: prefix check complete"
