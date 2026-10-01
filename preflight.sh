@@ -32,7 +32,7 @@ else
 fi
 echo "::debug ::Set PREFLIGHT_SHORT_LENGTH=$PREFLIGHT_SHORT_LENGTH"
 if [ -f "$GITHUB_OUTPUT" ]; then
-  safe=$(printf '%s' "$PREFLIGHT_SHORT_LENGTH" | tr -d '\n\r')
+  safe=$(printf '%s' "${PREFLIGHT_SHORT_LENGTH}" | tr -d '\n\r')
   echo "PREFLIGHT_SHORT_LENGTH=${safe}" >> "$GITHUB_OUTPUT"
 else
   echo "::set-output name=PREFLIGHT_SHORT_LENGTH::${PREFLIGHT_SHORT_LENGTH}"
