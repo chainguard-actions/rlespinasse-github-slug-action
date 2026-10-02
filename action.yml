@@ -90,9 +90,9 @@ runs:
     - id: get-github-repository-owner-part
       run: |
         ownerpart=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f1)
-        ownerpart=$(printf '%s' "$ownerpart" | tr -d '\n\r')
         if [ -f "$GITHUB_OUTPUT" ]; then
-          echo "github-repository-owner-part=${ownerpart}" >> "$GITHUB_OUTPUT"
+          safe=$(printf '%s' "$ownerpart" | tr -d '\n\r')
+          echo "github-repository-owner-part=${safe}" >> "$GITHUB_OUTPUT"
         else
           echo "::set-output name=github-repository-owner-part::${ownerpart}"
         fi
@@ -106,9 +106,9 @@ runs:
     - id: get-github-repository-name-part
       run: |
         namepart=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)
-        namepart=$(printf '%s' "$namepart" | tr -d '\n\r')
         if [ -f "$GITHUB_OUTPUT" ]; then
-          echo "github-repository-name-part=${namepart}" >> "$GITHUB_OUTPUT"
+          safe=$(printf '%s' "$namepart" | tr -d '\n\r')
+          echo "github-repository-name-part=${safe}" >> "$GITHUB_OUTPUT"
         else
           echo "::set-output name=github-repository-name-part::${namepart}"
         fi
