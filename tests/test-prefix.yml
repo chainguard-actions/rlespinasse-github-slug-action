@@ -6,20 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+
+      - name: Run github-slug-action with prefix
         uses: .
         with:
-          prefix: "CI_"
-          short-length: "7"
-      - name: Assert CI_GITHUB_REF_SLUG is set with prefix
-        run: |
-          echo "CI_GITHUB_REF_SLUG: $CI_GITHUB_REF_SLUG"
-          if [ -z "$CI_GITHUB_REF_SLUG" ]; then
-            echo "FAIL: CI_GITHUB_REF_SLUG is empty"
-            exit 1
-          fi
-          echo "PASS: CI_GITHUB_REF_SLUG=$CI_GITHUB_REF_SLUG"
-      - name: Assert CI_GITHUB_REPOSITORY_SLUG is set with prefix
+          prefix: CI_
+
+      - name: Assert prefixed GITHUB_REPOSITORY_SLUG is set
         run: |
           echo "CI_GITHUB_REPOSITORY_SLUG: $CI_GITHUB_REPOSITORY_SLUG"
           if [ -z "$CI_GITHUB_REPOSITORY_SLUG" ]; then
@@ -27,7 +20,17 @@ jobs:
             exit 1
           fi
           echo "PASS: CI_GITHUB_REPOSITORY_SLUG=$CI_GITHUB_REPOSITORY_SLUG"
-      - name: Assert CI_GITHUB_SHA_SHORT is set with prefix
+
+      - name: Assert prefixed GITHUB_REF_SLUG is set
+        run: |
+          echo "CI_GITHUB_REF_SLUG: $CI_GITHUB_REF_SLUG"
+          if [ -z "$CI_GITHUB_REF_SLUG" ]; then
+            echo "FAIL: CI_GITHUB_REF_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: CI_GITHUB_REF_SLUG=$CI_GITHUB_REF_SLUG"
+
+      - name: Assert prefixed GITHUB_SHA_SHORT is set
         run: |
           echo "CI_GITHUB_SHA_SHORT: $CI_GITHUB_SHA_SHORT"
           if [ -z "$CI_GITHUB_SHA_SHORT" ]; then
@@ -35,18 +38,30 @@ jobs:
             exit 1
           fi
           echo "PASS: CI_GITHUB_SHA_SHORT=$CI_GITHUB_SHA_SHORT"
-      - name: Assert CI_GITHUB_REF_SLUG_URL is set with prefix
+
+      - name: Assert prefixed GITHUB_REPOSITORY_OWNER_PART_SLUG is set
         run: |
-          echo "CI_GITHUB_REF_SLUG_URL: $CI_GITHUB_REF_SLUG_URL"
-          if [ -z "$CI_GITHUB_REF_SLUG_URL" ]; then
-            echo "FAIL: CI_GITHUB_REF_SLUG_URL is empty"
+          echo "CI_GITHUB_REPOSITORY_OWNER_PART_SLUG: $CI_GITHUB_REPOSITORY_OWNER_PART_SLUG"
+          if [ -z "$CI_GITHUB_REPOSITORY_OWNER_PART_SLUG" ]; then
+            echo "FAIL: CI_GITHUB_REPOSITORY_OWNER_PART_SLUG is empty"
             exit 1
           fi
-          echo "PASS: CI_GITHUB_REF_SLUG_URL=$CI_GITHUB_REF_SLUG_URL"
-      - name: Assert non-prefixed GITHUB_REF_SLUG is NOT set
+          echo "PASS: CI_GITHUB_REPOSITORY_OWNER_PART_SLUG=$CI_GITHUB_REPOSITORY_OWNER_PART_SLUG"
+
+      - name: Assert prefixed GITHUB_REPOSITORY_NAME_PART_SLUG is set
         run: |
-          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
-          if [ -n "$GITHUB_REF_SLUG" ]; then
-            echo "WARN: GITHUB_REF_SLUG is set when prefix is used (may be a default env var)"
+          echo "CI_GITHUB_REPOSITORY_NAME_PART_SLUG: $CI_GITHUB_REPOSITORY_NAME_PART_SLUG"
+          if [ -z "$CI_GITHUB_REPOSITORY_NAME_PART_SLUG" ]; then
+            echo "FAIL: CI_GITHUB_REPOSITORY_NAME_PART_SLUG is empty"
+            exit 1
           fi
-          echo "PASS: check complete"
+          echo "PASS: CI_GITHUB_REPOSITORY_NAME_PART_SLUG=$CI_GITHUB_REPOSITORY_NAME_PART_SLUG"
+
+      - name: Assert prefixed GITHUB_REF_NAME_SLUG is set
+        run: |
+          echo "CI_GITHUB_REF_NAME_SLUG: $CI_GITHUB_REF_NAME_SLUG"
+          if [ -z "$CI_GITHUB_REF_NAME_SLUG" ]; then
+            echo "FAIL: CI_GITHUB_REF_NAME_SLUG is empty"
+            exit 1
+          fi
+          echo "PASS: CI_GITHUB_REF_NAME_SLUG=$CI_GITHUB_REF_NAME_SLUG"

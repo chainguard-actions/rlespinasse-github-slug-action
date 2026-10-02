@@ -90,11 +90,11 @@ runs:
     - id: get-github-repository-owner-part
       run: |
         ownerpart=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f1)
+        safe_ownerpart=$(printf '%s' "$ownerpart" | tr -d '\n\r')
         if [ -f "$GITHUB_OUTPUT" ]; then
-          safe=$(printf '%s' "${ownerpart}" | tr -d '\n\r')
-          echo "github-repository-owner-part=${safe}" >> "$GITHUB_OUTPUT"
+          echo "github-repository-owner-part=${safe_ownerpart}" >> "$GITHUB_OUTPUT"
         else
-          echo "::set-output name=github-repository-owner-part::${ownerpart}"
+          echo "::set-output name=github-repository-owner-part::${safe_ownerpart}"
         fi
       shell: bash
     - uses: chainguard-actions/rlespinasse-slugify-value@dd55e795a070741b6136048c7769b489fc25626d # v1.4.0
@@ -106,11 +106,11 @@ runs:
     - id: get-github-repository-name-part
       run: |
         namepart=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)
+        safe_namepart=$(printf '%s' "$namepart" | tr -d '\n\r')
         if [ -f "$GITHUB_OUTPUT" ]; then
-          safe=$(printf '%s' "${namepart}" | tr -d '\n\r')
-          echo "github-repository-name-part=${safe}" >> "$GITHUB_OUTPUT"
+          echo "github-repository-name-part=${safe_namepart}" >> "$GITHUB_OUTPUT"
         else
-          echo "::set-output name=github-repository-name-part::${namepart}"
+          echo "::set-output name=github-repository-name-part::${safe_namepart}"
         fi
       shell: bash
     - uses: chainguard-actions/rlespinasse-slugify-value@dd55e795a070741b6136048c7769b489fc25626d # v1.4.0

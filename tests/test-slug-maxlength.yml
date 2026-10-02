@@ -6,44 +6,68 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+
+      - name: Run github-slug-action with short maxlength
         uses: .
         with:
-          slug-maxlength: "5"
-          short-length: "7"
-      - name: Assert GITHUB_REF_SLUG is set
+          slug-maxlength: "10"
+
+      - name: Assert GITHUB_REPOSITORY_SLUG respects maxlength
+        run: |
+          echo "GITHUB_REPOSITORY_SLUG: $GITHUB_REPOSITORY_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG is empty"
+            exit 1
+          fi
+          LEN=${#GITHUB_REPOSITORY_SLUG}
+          echo "Length: $LEN"
+          if [ "$LEN" -gt 10 ]; then
+            echo "FAIL: GITHUB_REPOSITORY_SLUG length $LEN exceeds maxlength 10"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG (length=$LEN)"
+
+      - name: Assert GITHUB_REF_SLUG respects maxlength
         run: |
           echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
           if [ -z "$GITHUB_REF_SLUG" ]; then
             echo "FAIL: GITHUB_REF_SLUG is empty"
             exit 1
           fi
-          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
-      - name: Assert GITHUB_REF_SLUG does not exceed maxlength of 5
-        run: |
-          echo "GITHUB_REF_SLUG: $GITHUB_REF_SLUG"
-          len=${#GITHUB_REF_SLUG}
-          echo "Length: $len"
-          if [ "$len" -gt 5 ]; then
-            echo "FAIL: GITHUB_REF_SLUG length $len exceeds max 5"
+          LEN=${#GITHUB_REF_SLUG}
+          echo "Length: $LEN"
+          if [ "$LEN" -gt 10 ]; then
+            echo "FAIL: GITHUB_REF_SLUG length $LEN exceeds maxlength 10"
             exit 1
           fi
-          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG (length=$len)"
-      - name: Assert GITHUB_REPOSITORY_SLUG does not exceed maxlength of 5
+          echo "PASS: GITHUB_REF_SLUG=$GITHUB_REF_SLUG (length=$LEN)"
+
+      - name: Assert GITHUB_REF_NAME_SLUG respects maxlength
         run: |
-          echo "GITHUB_REPOSITORY_SLUG: $GITHUB_REPOSITORY_SLUG"
-          len=${#GITHUB_REPOSITORY_SLUG}
-          echo "Length: $len"
-          if [ "$len" -gt 5 ]; then
-            echo "FAIL: GITHUB_REPOSITORY_SLUG length $len exceeds max 5"
+          echo "GITHUB_REF_NAME_SLUG: $GITHUB_REF_NAME_SLUG"
+          if [ -z "$GITHUB_REF_NAME_SLUG" ]; then
+            echo "FAIL: GITHUB_REF_NAME_SLUG is empty"
             exit 1
           fi
-          echo "PASS: GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG (length=$len)"
-      - name: Assert GITHUB_SHA_SHORT is set
-        run: |
-          echo "GITHUB_SHA_SHORT: $GITHUB_SHA_SHORT"
-          if [ -z "$GITHUB_SHA_SHORT" ]; then
-            echo "FAIL: GITHUB_SHA_SHORT is empty"
+          LEN=${#GITHUB_REF_NAME_SLUG}
+          echo "Length: $LEN"
+          if [ "$LEN" -gt 10 ]; then
+            echo "FAIL: GITHUB_REF_NAME_SLUG length $LEN exceeds maxlength 10"
             exit 1
           fi
-          echo "PASS: GITHUB_SHA_SHORT=$GITHUB_SHA_SHORT"
+          echo "PASS: GITHUB_REF_NAME_SLUG=$GITHUB_REF_NAME_SLUG (length=$LEN)"
+
+      - name: Assert GITHUB_REPOSITORY_OWNER_PART_SLUG respects maxlength
+        run: |
+          echo "GITHUB_REPOSITORY_OWNER_PART_SLUG: $GITHUB_REPOSITORY_OWNER_PART_SLUG"
+          if [ -z "$GITHUB_REPOSITORY_OWNER_PART_SLUG" ]; then
+            echo "FAIL: GITHUB_REPOSITORY_OWNER_PART_SLUG is empty"
+            exit 1
+          fi
+          LEN=${#GITHUB_REPOSITORY_OWNER_PART_SLUG}
+          echo "Length: $LEN"
+          if [ "$LEN" -gt 10 ]; then
+            echo "FAIL: GITHUB_REPOSITORY_OWNER_PART_SLUG length $LEN exceeds maxlength 10"
+            exit 1
+          fi
+          echo "PASS: GITHUB_REPOSITORY_OWNER_PART_SLUG=$GITHUB_REPOSITORY_OWNER_PART_SLUG (length=$LEN)"
