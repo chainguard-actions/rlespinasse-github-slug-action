@@ -42,6 +42,7 @@ runs:
       env:
         INPUT_SLUG_MAXLENGTH: ${{ inputs.slug-maxlength }}
         INPUT_SHORT_LENGTH: ${{ inputs.short-length }}
+
     # From Environment Variables
     - uses: chainguard-actions/rlespinasse-slugify-value@dd55e795a070741b6136048c7769b489fc25626d # v1.4.0
       with:
@@ -64,6 +65,7 @@ runs:
         key: GITHUB_BASE_REF
         prefix: ${{ inputs.prefix }}
         slug-maxlength: ${{ inputs.slug-maxlength }}
+
     # From Specific values
     - uses: chainguard-actions/rlespinasse-slugify-value@dd55e795a070741b6136048c7769b489fc25626d # v1.4.0
       with:
@@ -86,6 +88,7 @@ runs:
       env:
         GITHUB_HEAD_REF_RAW: ${{ github.head_ref }}
         GITHUB_REF_NAME_RAW: ${{ github.ref_name }}
+
     # From Calculated values
     - id: get-github-repository-owner-part
       run: |
@@ -119,6 +122,7 @@ runs:
         value: ${{ steps.get-github-repository-name-part.outputs.github-repository-name-part }}
         prefix: ${{ inputs.prefix }}
         slug-maxlength: ${{ inputs.slug-maxlength }}
+
     # From sha
     - uses: chainguard-actions/rlespinasse-shortify-git-revision@770cb39873906d57eb4d46d551c2a5ccbaad38e4 # v1.6.0
       with:
